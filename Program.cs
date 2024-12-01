@@ -219,17 +219,50 @@ namespace AoC2024
         #endregion
 
         #region day 1
-        static void day1a() //
+        static void day1a() //1722302
         {
             List<string> data = dataToList(getData("1"), Environment.NewLine);
+            List<int> colA = new();
+            List<int> colB = new();
             int total = 0;
+
+            foreach (string s in data)
+            {
+                colA.Add(int.Parse(s.Split("   ")[0]));
+                colB.Add(int.Parse(s.Split("   ")[1]));
+            }
+
+            colA.Sort();
+            colB.Sort();
+
+            for (int i = 0; i < colA.Count; i++)
+            {
+                total += Math.Abs(colA[i] - colB[i]);
+            }
 
             printInt(total);
         }
 
-        static void day1b() //
+        static void day1b() //20373490
         {
+            List<string> data = dataToList(getData("1"), Environment.NewLine);
+            List<int> colA = new();
+            List<int> colB = new();
+            int total = 0;
 
+            foreach (string s in data)
+            {
+                colA.Add(int.Parse(s.Split("   ")[0]));
+                colB.Add(int.Parse(s.Split("   ")[1]));
+            }
+
+            for (int i = 0; i < colA.Count; i++)
+            {
+                int count = colB.FindAll(x => x == colA[i]).Count();
+                total += colA[i] * count;
+            }
+
+            printInt(total);
         }
         #endregion
 
