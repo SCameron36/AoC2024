@@ -334,8 +334,7 @@ namespace AoC2024
                 {
                     for (int i = 0; i < reports.Count; i++)
                     {
-                        List<int> r = new List<int>();
-                        r.AddRange(s.Trim().Split(" ").Select(int.Parse).ToList());
+                        List<int> r = s.Trim().Split(" ").Select(int.Parse).ToList();
                         r.RemoveAt(i);
 
                         safe = day2safe(r);
