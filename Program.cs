@@ -307,7 +307,7 @@ namespace AoC2024
                     else
                         valid = false;
 
-                    if (valid == false)
+                    if (!valid)
                         break;
                 }
 
