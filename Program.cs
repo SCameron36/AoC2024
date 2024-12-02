@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 
 namespace AoC2024
 {
@@ -267,14 +268,88 @@ namespace AoC2024
         #endregion
 
         #region day 2
-        static void day2a() //
+        static void day2a() //287
         {
+            List<string> data = dataToList(getData("2"), Environment.NewLine);
+            int count = 0;
 
+            foreach (string s in data)
+            {
+                List<int> reports = s.Trim().Split(" ").Select(int.Parse).ToList();
+
+                if (day2safe(reports))
+                    count++;
+            }
+
+            printInt(count);
         }
 
-        static void day2b() //
+        static private bool day2safe(List<int> reports)
         {
+            int p = -1;
+            bool? increasing = null;
+            bool valid = false;
+            foreach (int i in reports)
+            {
+                if (p != -1)
+                {
+                    if (increasing == null)
+                        increasing = i > p;
 
+                    if ((bool)increasing && i > p && i <= p + 3)
+                    {
+                        valid = true;
+                    }
+                    else if (!(bool)increasing && i < p && i >= p - 3)
+                    {
+                        valid = true;
+                    }
+                    else
+                        valid = false;
+
+                    if (valid == false)
+                        break;
+                }
+
+                p = i;
+            }
+            return valid;
+        }
+
+        static void day2b() //354
+        {
+            List<string> data = dataToList(getData("2"), Environment.NewLine);
+            int count = 0;
+
+            foreach (string s in data)
+            {
+                List<int> reports = s.Trim().Split(" ").Select(int.Parse).ToList();
+
+                bool safe = day2safe(reports);
+                if (safe)
+                {
+                    count++;
+                }
+                else
+                {
+                    for (int i = 0; i < reports.Count; i++)
+                    {
+                        List<int> r = new List<int>();
+                        r.AddRange(s.Trim().Split(" ").Select(int.Parse).ToList());
+                        r.RemoveAt(i);
+
+                        safe = day2safe(r);
+
+                        if (safe)
+                        {
+                            count++;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            printInt(count);
         }
         #endregion
 
