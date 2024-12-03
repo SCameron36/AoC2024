@@ -341,14 +341,50 @@ namespace AoC2024
         #endregion
 
         #region day 3
-        static void day3a() //
+        static void day3a() //162813399
         {
+            string data = getData("3");
+            int total = 0;
+            Regex regex = new("mul\\([0-9]{1,3},[0-9]{1,3}\\)");
+            Regex regexNums = new("[0-9]{1,3},[0-9]{1,3}");
 
+            MatchCollection matches = regex.Matches(data);
+            foreach(Match m in matches) 
+            {
+                total += int.Parse(regexNums.Match(m.Value).Value.Split(",")[0]) * int.Parse(regexNums.Match(m.Value).Value.Split(",")[1]);
+            }
+
+            printInt(total);
         }
 
-        static void day3b() //
+        static void day3b() //53783319
         {
+            string data = getData("3");
+            int total = 0;
+            Regex regex = new("mul\\([0-9]{1,3},[0-9]{1,3}\\)");
+            Regex regexNums = new("[0-9]{1,3},[0-9]{1,3}");
 
+            List<string> chunks = data.Split("do()").ToList();
+            List<string> cleanedChunks = new();
+
+            foreach(string chunk in chunks)
+            {
+                if (chunk.IndexOf("don't()")  > 0)
+                    cleanedChunks.Add(chunk.Substring(0,chunk.IndexOf("don't()")));
+                else cleanedChunks.Add(chunk);
+            }
+
+            foreach (string chunk in cleanedChunks)
+            {
+                MatchCollection matches = regex.Matches(chunk);
+
+                foreach (Match m in matches)
+                {
+                    total += int.Parse(regexNums.Match(m.Value).Value.Split(",")[0]) * int.Parse(regexNums.Match(m.Value).Value.Split(",")[1]);
+                }
+            }
+
+            printInt(total);
         }
         #endregion
 
