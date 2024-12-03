@@ -365,14 +365,7 @@ namespace AoC2024
             Regex regexNums = new("[0-9]{1,3},[0-9]{1,3}");
 
             List<string> chunks = data.Split("do()").ToList();
-            List<string> cleanedChunks = new();
-
-            foreach(string chunk in chunks)
-            {
-                if (chunk.IndexOf("don't()")  > 0)
-                    cleanedChunks.Add(chunk.Substring(0,chunk.IndexOf("don't()")));
-                else cleanedChunks.Add(chunk);
-            }
+            List<string> cleanedChunks = chunks.Select(x => x.Substring(0, x.IndexOf("don't()") > 0 ? x.IndexOf("don't()") : x.Length)).ToList();
 
             foreach (string chunk in cleanedChunks)
             {
