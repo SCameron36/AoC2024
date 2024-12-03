@@ -223,15 +223,9 @@ namespace AoC2024
         static void day1a() //1722302
         {
             List<string> data = dataToList(getData("1"), Environment.NewLine);
-            List<int> colA = new();
-            List<int> colB = new();
+            List<int> colA = data.Select(x => int.Parse(x.Split("   ")[0])).ToList();
+            List<int> colB = data.Select(x => int.Parse(x.Split("   ")[1])).ToList();
             int total = 0;
-
-            foreach (string s in data)
-            {
-                colA.Add(int.Parse(s.Split("   ")[0]));
-                colB.Add(int.Parse(s.Split("   ")[1]));
-            }
 
             colA.Sort();
             colB.Sort();
@@ -247,15 +241,9 @@ namespace AoC2024
         static void day1b() //20373490
         {
             List<string> data = dataToList(getData("1"), Environment.NewLine);
-            List<int> colA = new();
-            List<int> colB = new();
+            List<int> colA = data.Select(x => int.Parse(x.Split("   ")[0])).ToList();
+            List<int> colB = data.Select(x => int.Parse(x.Split("   ")[1])).ToList();
             int total = 0;
-
-            foreach (string s in data)
-            {
-                colA.Add(int.Parse(s.Split("   ")[0]));
-                colB.Add(int.Parse(s.Split("   ")[1]));
-            }
 
             for (int i = 0; i < colA.Count; i++)
             {
