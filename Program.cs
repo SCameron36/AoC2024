@@ -398,28 +398,25 @@ namespace AoC2024
                     //Vertical
                     if (r <= data.Count - 4)
                     {
-                        if (data[r][c] == 'X' && data[r + 1][c] == 'M' && data[r + 2][c] == 'A' && data[r + 3][c] == 'S')
-                            count++;
-                        else if (data[r][c] == 'S' && data[r + 1][c] == 'A' && data[r + 2][c] == 'M' && data[r + 3][c] == 'X')
-                            count++;
+						string check = string.Concat(data[r][c],data[r + 1][c],data[r + 2][c],data[r + 3][c]);
+						if (check == "XMAS" || check == "SAMX")
+							count++;
                     }
 
                     //Diagonal \
                     if (c <= data[0].Length - 4 && r <= data.Count - 4)
                     {
-                        if (data[r][c] == 'X' && data[r + 1][c+1] == 'M' && data[r + 2][c+2] == 'A' && data[r + 3][c+3] == 'S')
-                            count++;
-                        else if (data[r][c] == 'S' && data[r + 1][c+1] == 'A' && data[r + 2][c+2] == 'M' && data[r + 3][c+3] == 'X')
-                            count++;
+						string check = string.Concat(data[r][c], data[r + 1][c+1], data[r + 2][c+2], data[r + 3][c+3]);
+						if (check == "XMAS" || check == "SAMX")
+							count++;
                     }
 
                     //Diagonal /
                     if (c >=3 && r <= data.Count - 4)
                     {
-                        if (data[r][c] == 'X' && data[r + 1][c - 1] == 'M' && data[r + 2][c - 2] == 'A' && data[r + 3][c - 3] == 'S')
-                            count++;
-                        else if (data[r][c] == 'S' && data[r + 1][c - 1] == 'A' && data[r + 2][c - 2] == 'M' && data[r + 3][c - 3] == 'X')
-                            count++;
+						string check = string.Concat(data[r][c], data[r + 1][c-1], data[r + 2][c-2], data[r + 3][c-3]);
+						if (check == "XMAS" || check == "SAMX")
+							count++;
                     }
                 }
             }
