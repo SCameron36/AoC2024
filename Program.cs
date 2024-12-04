@@ -398,25 +398,25 @@ namespace AoC2024
                     //Vertical
                     if (r <= data.Count - 4)
                     {
-						string check = string.Concat(data[r][c],data[r + 1][c],data[r + 2][c],data[r + 3][c]);
-						if (check == "XMAS" || check == "SAMX")
-							count++;
+                        string check = string.Concat(data[r][c],data[r + 1][c],data[r + 2][c],data[r + 3][c]);
+                        if (check == "XMAS" || check == "SAMX")
+                            count++;
                     }
 
                     //Diagonal \
                     if (c <= data[0].Length - 4 && r <= data.Count - 4)
                     {
-						string check = string.Concat(data[r][c], data[r + 1][c+1], data[r + 2][c+2], data[r + 3][c+3]);
-						if (check == "XMAS" || check == "SAMX")
-							count++;
+                        string check = string.Concat(data[r][c], data[r + 1][c+1], data[r + 2][c+2], data[r + 3][c+3]);
+                        if (check == "XMAS" || check == "SAMX")
+                            count++;
                     }
 
                     //Diagonal /
                     if (c >=3 && r <= data.Count - 4)
                     {
-						string check = string.Concat(data[r][c], data[r + 1][c-1], data[r + 2][c-2], data[r + 3][c-3]);
-						if (check == "XMAS" || check == "SAMX")
-							count++;
+                        string check = string.Concat(data[r][c], data[r + 1][c-1], data[r + 2][c-2], data[r + 3][c-3]);
+                        if (check == "XMAS" || check == "SAMX")
+                            count++;
                     }
                 }
             }
