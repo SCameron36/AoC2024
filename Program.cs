@@ -437,11 +437,14 @@ namespace AoC2024
                     bool good = false;
                     if (data[r][c] == 'A')
                     {
-                        //Diagonal /
-                        good = (data[r - 1][c + 1] == 'M' && data[r + 1][c - 1] == 'S') || (data[r - 1][c + 1] == 'S' && data[r + 1][c - 1] == 'M');
+                        string UD = string.Concat(data[r - 1][c - 1], data[r + 1][c + 1]);
+                        string DU = string.Concat(data[r + 1][c - 1], data[r - 1][c + 1]);
 
                         //Diagonal \
-                        good = good && ((data[r + 1][c + 1] == 'M' && data[r - 1][c - 1] == 'S') || (data[r + 1][c + 1] == 'S' && data[r - 1][c - 1] == 'M'));
+                        good = (UD == "SM" || UD == "MS");
+
+                        //Diagonal /
+                        good = good && (DU == "SM" || DU == "MS");
 
                         if (good)
                             count++;
