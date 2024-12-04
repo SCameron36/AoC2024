@@ -382,14 +382,76 @@ namespace AoC2024
         #endregion
 
         #region day 4
-        static void day4a() //
+        static void day4a() //2458
         {
+            List<string> data = dataToList(getData("4"), Environment.NewLine);
+            int count = 0;
+            Regex forwards = new("XMAS");
+            Regex backwards = new("SAMX");
+            for (int r = 0; r < data.Count; r++) 
+            {
+                count += forwards.Count(data[r]);
+                count += backwards.Count(data[r]);
 
+                for (int c = 0; c < data.Count; c++)
+                {
+                    //Vertical
+                    if (r <= data.Count - 4)
+                    {
+                        if (data[r][c] == 'X' && data[r + 1][c] == 'M' && data[r + 2][c] == 'A' && data[r + 3][c] == 'S')
+                            count++;
+                        else if (data[r][c] == 'S' && data[r + 1][c] == 'A' && data[r + 2][c] == 'M' && data[r + 3][c] == 'X')
+                            count++;
+                    }
+
+                    //Diagonal \
+                    if (c <= data[0].Length - 4 && r <= data.Count - 4)
+                    {
+                        if (data[r][c] == 'X' && data[r + 1][c+1] == 'M' && data[r + 2][c+2] == 'A' && data[r + 3][c+3] == 'S')
+                            count++;
+                        else if (data[r][c] == 'S' && data[r + 1][c+1] == 'A' && data[r + 2][c+2] == 'M' && data[r + 3][c+3] == 'X')
+                            count++;
+                    }
+
+                    //Diagonal /
+                    if (c >=3 && r <= data.Count - 4)
+                    {
+                        if (data[r][c] == 'X' && data[r + 1][c - 1] == 'M' && data[r + 2][c - 2] == 'A' && data[r + 3][c - 3] == 'S')
+                            count++;
+                        else if (data[r][c] == 'S' && data[r + 1][c - 1] == 'A' && data[r + 2][c - 2] == 'M' && data[r + 3][c - 3] == 'X')
+                            count++;
+                    }
+                }
+            }
+
+            printInt(count);
         }
 
-        static void day4b() //
+        static void day4b() //1945
         {
+            List<string> data = dataToList(getData("4"), Environment.NewLine);
+            int count = 0;
 
+            for (int r = 1; r < data.Count - 1; r++)
+            {
+                for (int c = 1; c < data.Count - 1; c++)
+                {
+                    bool good = false;
+                    if (data[r][c] == 'A')
+                    {
+                        //Diagonal /
+                        good = (data[r - 1][c + 1] == 'M' && data[r + 1][c - 1] == 'S') || (data[r - 1][c + 1] == 'S' && data[r + 1][c - 1] == 'M');
+
+                        //Diagonal \
+                        good = good && ((data[r + 1][c + 1] == 'M' && data[r - 1][c - 1] == 'S') || (data[r + 1][c + 1] == 'S' && data[r - 1][c - 1] == 'M'));
+
+                        if (good)
+                            count++;
+                    }
+                }
+            }
+
+            printInt(count);
         }
         #endregion
 
