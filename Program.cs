@@ -1,5 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Data;
+using System.Net;
 using System.Text.RegularExpressions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AoC2024
 {
@@ -457,14 +460,128 @@ namespace AoC2024
         #endregion
 
         #region day 5
-        static void day5a() //
-        {
 
+        static List<string> d5Rules = new();
+        static List<string> d5Updates = new();
+        static List<string> d5BadUpdates = new();
+        static void day5a() //5166
+        {
+            string data = getData("5");
+            d5Rules = dataToList(data.Split(string.Concat(Environment.NewLine, Environment.NewLine))[0], Environment.NewLine);
+            d5Updates = dataToList(data.Split(string.Concat(Environment.NewLine, Environment.NewLine))[1], Environment.NewLine);
+
+            List<string> goodUpdates = day5GetGoodUpdates();
+
+            int total = 0;
+
+            foreach (string goodUpdate in goodUpdates)
+            {
+                List<string> pages = goodUpdate.Split(",").ToList();
+                total += int.Parse(pages[pages.Count / 2]);
+            }            
+
+            printInt(total);
         }
 
-        static void day5b() //
+        static List<string> day5GetGoodUpdates(bool setBad = false)
         {
+            List<string> toReturn = new();
 
+            foreach (string row in d5Updates)
+            {
+                if (day5IsGood(row))
+                    toReturn.Add(row);
+                else
+                    d5BadUpdates.Add(row);
+            }
+
+            return toReturn;
+        }
+
+        static bool day5IsGood(string row)
+        {
+            List<string> pages = row.Split(",").ToList();
+
+            for (int i = 0; i < pages.Count; i++)
+            {
+                string page = pages[i];
+                List<string> curRules = d5Rules.FindAll(x => x.EndsWith(page));
+   
+                foreach (string rule in curRules)
+                {
+                    if (pages.Contains(rule.Split("|")[0]) && pages.IndexOf(rule.Split("|")[0]) > i)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        static string day5FixRow(string row)
+        {
+            string fixedRow = row;
+
+            List<string> pages = dataToList(row, ",");
+
+            while (!day5IsGood(fixedRow))
+            {
+                for (int i = 0; i < pages.Count; i++)
+                {
+                    string page = pages[i];
+
+                    List<string> curRules = d5Rules.FindAll(x => x.EndsWith(page));
+
+                    for (int j = i + 1; j < pages.Count; j++)
+                    {
+                        page = pages[i];
+                        string nextPage = pages[j];
+
+                        foreach (string rule in curRules)
+                        {
+                            if (rule.StartsWith(nextPage))
+                            {
+                                Console.WriteLine(rule);
+                                pages[i] = nextPage;
+                                pages[j] = page;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                fixedRow = "";
+                foreach (string page in pages)
+                {
+                    fixedRow += page + ",";
+                }
+
+                fixedRow = fixedRow.Remove(fixedRow.Length - 1, 1);
+            }
+            
+            return fixedRow;
+        }
+
+        static void day5b() //4679
+        {
+            string data = getData("5");
+            d5Rules = dataToList(data.Split(string.Concat(Environment.NewLine, Environment.NewLine))[0], Environment.NewLine);
+            d5Updates = dataToList(data.Split(string.Concat(Environment.NewLine, Environment.NewLine))[1], Environment.NewLine);
+
+            day5GetGoodUpdates(true);
+
+            int total = 0;
+
+            foreach (string update in d5BadUpdates)
+            {
+                string updated = day5FixRow(update);
+
+                List<string> pages = updated.Split(",").ToList();
+                total += int.Parse(pages[pages.Count / 2]);
+            }
+
+            printInt(total);
         }
         #endregion
 
