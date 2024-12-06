@@ -403,14 +403,14 @@ namespace AoC2024
                     {
                         //Vertical
                         string check = string.Concat(data[r][c], data[r + 1][c], data[r + 2][c], data[r + 3][c]);
-                        if (check == "XMAS" || check == "SAMX")
+                        if (forwards.IsMatch(check) || backwards.IsMatch(check))
                             count++;
 
                         //Diagonal \
                         if (c <= data[0].Length - 4)
                         {
                             check = string.Concat(data[r][c], data[r + 1][c + 1], data[r + 2][c + 2], data[r + 3][c + 3]);
-                            if (check == "XMAS" || check == "SAMX")
+                            if (forwards.IsMatch(check) || backwards.IsMatch(check))
                                 count++;
                         }
 
@@ -418,7 +418,7 @@ namespace AoC2024
                         if (c >= 3)
                         {
                             check = string.Concat(data[r][c], data[r + 1][c - 1], data[r + 2][c - 2], data[r + 3][c - 3]);
-                            if (check == "XMAS" || check == "SAMX")
+                            if (forwards.IsMatch(check) || backwards.IsMatch(check))
                                 count++;
                         }
                     }
