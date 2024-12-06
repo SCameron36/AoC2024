@@ -542,7 +542,6 @@ namespace AoC2024
                         {
                             if (rule.StartsWith(nextPage))
                             {
-                                Console.WriteLine(rule);
                                 pages[i] = nextPage;
                                 pages[j] = page;
                                 break;
@@ -588,12 +587,13 @@ namespace AoC2024
         #region day 6
         static void day6a() //
         {
+            List<string> data = dataToList(getData("6"), Environment.NewLine);
 
         }
 
         static void day6b() //
         {
-
+            
         }
         #endregion
 
