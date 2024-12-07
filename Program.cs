@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Net;
+using System.Numerics;
 using System.Text.RegularExpressions;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -187,6 +188,11 @@ namespace AoC2024
         }
 
         static void printInt(int num)
+        {
+            Console.WriteLine(num);
+        }
+
+        static void printLong(long num)
         {
             Console.WriteLine(num);
         }
@@ -585,27 +591,205 @@ namespace AoC2024
         #endregion
 
         #region day 6
-        static void day6a() //
+        static void day6a() //4647
         {
             List<string> data = dataToList(getData("6"), Environment.NewLine);
+            d6Points = new();
 
+            int x = 0;
+            int y = 0;
+            int count = 0;
+            d6Rows = data.Count;
+            d6Columns = data[0].Length;
+
+            for (int i = 0; i < data.Count; i++)
+            {
+                for (int j = 0; j < data[0].Length; j++)
+                {
+                    d6Points.Add(new Point(i, j), data[i][j]);
+                    if (data[i][j] == '^')
+                    {
+                        x = i;
+                        y = j;
+                    }
+                }
+            }
+
+            count = day6Traverse(x, y, -1, 0).visited.Count();
+
+            printInt(count);
         }
 
-        static void day6b() //
+        static (IEnumerable<(int,int)> visited, bool looped) day6Traverse(int x, int y, int dirX, int dirY)
         {
+            HashSet<(int,int,int,int)> points = new();
+            bool looped = false;
             
+            while (true)
+            {
+                looped = !points.Add((x, y, dirX, dirY));
+
+                int newX = x + dirX; 
+                int newY = y + dirY;
+
+                if (looped || newX < 0 || newY < 0 || newX >= d6Rows || newY >= d6Columns)
+                    break;
+
+                if (d6Points[new Point(newX, newY)] == '#')
+                {
+                    int t = dirX;
+                    dirX = dirY;
+                    dirY = t * -1;
+                    continue;
+                }
+
+                x += dirX;
+                y += dirY;
+            }
+
+            return (points.Select(p => (p.Item1, p.Item2)).Distinct(), looped);
+        }
+
+        static Dictionary<Point, char> d6Points = new();
+        static int d6Rows;
+        static int d6Columns;
+        static void day6b() //1723
+        {
+            List<string> data = dataToList(getData("6"), Environment.NewLine);
+            d6Points = new();
+
+            int x = 0;
+            int y = 0;
+            int count = 0;
+            d6Rows = data.Count;
+            d6Columns = data[0].Length;
+
+            for (int i = 0; i < data.Count; i++)
+            {
+                for (int j = 0; j < data[0].Length; j++)
+                {
+                    d6Points.Add(new Point(i, j), data[i][j]);
+                    if (data[i][j] == '^')
+                    {
+                        x = i;
+                        y = j;
+                    }
+                }
+            }
+
+            foreach((int X, int Y) in day6Traverse(x, y, -1, 0).visited.Skip(1))
+            {
+                char temp = d6Points[new Point(X,Y)];
+                d6Points[new Point(X, Y)] = '#';
+
+                if (day6Traverse(x, y, -1, 0).looped)
+                    count++;
+
+                d6Points[new Point(X, Y)] = temp;
+            }
+
+            printInt(count);
         }
         #endregion
 
         #region day 7
-        static void day7a() //
+        static void day7a() //2664460013123
         {
+            List<string> data = dataToList(getData("7"), Environment.NewLine);
+            List<char> operators = new List<char>{ '+', '*' };
+            long total = 0;
 
+            foreach (string row in data)
+            {
+                long rowTotal = long.Parse(row.Split(':')[0]);
+                List<int> nums = row.Split(':')[1].TrimStart().Split(" ").Select(int.Parse).ToList();
+
+                List<char[]> combinations = day7Combinations(nums.Count-1,operators).ToList();
+
+                foreach (char[] combination in combinations.FindAll(x => x.Length == nums.Count - 1))
+                {
+                    long curTotal = nums[0];
+                    for (int i = 0; i < combination.Length; i++)
+                    {
+                        if (combination[i] == '+')
+                        {
+                            curTotal += nums[i + 1];
+                        }
+                        else
+                            curTotal *= nums[i + 1];
+                    }
+                    if (rowTotal == curTotal)
+                    {
+                        total += curTotal;
+                        break;
+                    }
+                }
+            }
+            printLong(total);
         }
 
-        static void day7b() //
+        //https://stackoverflow.com/questions/76874321/all-combinations-and-permutations-of-a-set-of-characters-to-a-given-length-in-c
+        private static IEnumerable<T[]> day7Combinations<T>(int maxLength, IEnumerable<T> chars)
         {
+            if (maxLength < 0)
+                throw new ArgumentOutOfRangeException(nameof(maxLength));
 
+            if (chars is null)
+                throw new ArgumentNullException(nameof(chars));
+
+            var letters = chars.Distinct().ToArray();
+
+            if (letters.Length == 0)
+                yield break;
+
+            for (var agenda = new Queue<T[]>(new[] { Array.Empty<T>() });
+                     agenda.Peek().Length < maxLength;)
+            {
+                var current = agenda.Dequeue();
+
+                foreach (var letter in letters)
+                {
+                    var next = current.Append(letter).ToArray();
+
+                    agenda.Enqueue(next);
+
+                    yield return next;
+                }
+            }
+        }
+
+        static void day7b() //426214131924213
+        {
+            List<string> data = dataToList(getData("7"), Environment.NewLine);
+            List<char> operators = new List<char> { '+', '*' , '|'};
+            BigInteger total = 0;
+
+            foreach (string row in data)
+            {
+                BigInteger rowTotal = BigInteger.Parse(row.Split(':')[0]);
+                List<int> nums = row.Split(':')[1].TrimStart().Split(" ").Select(int.Parse).ToList();
+                List<char[]> combinations = day7Combinations(nums.Count - 1, operators).ToList();
+
+                foreach (char[] combination in combinations.FindAll(x => x.Length == nums.Count - 1))
+                {
+                    BigInteger curTotal = nums[0];
+                    for (int i = 0; i < combination.Length; i++)
+                    {
+                        if (combination[i] == '+')
+                            curTotal += nums[i + 1];
+                        else if (combination[i] == '*')
+                            curTotal *= nums[i + 1];
+                        else
+                            curTotal = BigInteger.Parse($"{curTotal}{nums[i+1]}");
+                    }
+                    if (rowTotal == curTotal)
+                    {
+                        total += curTotal;
+                        break;
+                    }
+                }
+            }
+            print(total.ToString());
         }
         #endregion
 
