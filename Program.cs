@@ -794,21 +794,147 @@ namespace AoC2024
         #endregion
 
         #region day 8
-        static void day8a() //
+        static void day8a() //361
         {
+            List<string> data = dataToList(getData("8"), Environment.NewLine);
+            List<(char c, int x, int y)> grid = new();
+            List<Point> antennas = new();
+            int rows = data.Count;
+            int cols = data[0].Length;
+            int count = 0;
 
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < cols; j++)
+                {
+                    if (data[i][j] != '.')
+                        grid.Add((data[i][j], i, j));
+                }
+            }
+
+            for (int i = 0;i < grid.Count; i++)
+            {
+                (char c, int x, int y) cur = grid.ElementAt(i);
+
+                List<(char c, int x, int y)> matches = grid.FindAll(x => x.c == cur.c).ToList();
+                matches.Remove(cur);
+                
+                foreach ((char c, int x, int y) match in matches)
+                {
+                    int xDif = cur.x - match.x;
+                    int yDif = cur.y - match.y;
+
+                    Point a1 = new Point(cur.x + xDif, cur.y + yDif);
+                    Point a2 = new Point(match.x - xDif, match.y - yDif);
+
+                    if (day8isInBounds(a1.X, a1.Y, rows, cols))
+                    {
+                        if (!(antennas.Contains(a1) && grid.Select(x => x.x == a1.X && x.y == a1.Y) != null))
+                            antennas.Add(a1);
+                    }
+                    if (day8isInBounds(a2.X, a2.Y, rows, cols))
+                    {
+                        if (!(antennas.Contains(a2) && grid.Select(x => x.x == a2.X && x.y == a2.Y) != null))
+                            antennas.Add(a2);
+                    }
+                }
+            }
+
+            printInt(antennas.Count);
         }
 
-        static void day8b() //
+        static bool day8isInBounds(int x, int y, int height, int width)
         {
+            return (x >= 0 & x < height && y >= 0 && y < width);
+        }
 
+        static void day8b() //1249
+        {
+            List<string> data = dataToList(getData("8"), Environment.NewLine);
+            List<(char c, int x, int y)> grid = new();
+            List<Point> antennas = new();
+            int rows = data.Count;
+            int cols = data[0].Length;
+            int count = 0;
+
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < cols; j++)
+                {
+                    if (data[i][j] != '.')
+                        grid.Add((data[i][j], i, j));
+                }
+            }
+
+            for (int i = 0; i < grid.Count; i++)
+            {
+                (char c, int x, int y) cur = grid.ElementAt(i);
+
+                List<(char c, int x, int y)> matches = grid.FindAll(x => x.c == cur.c).ToList();
+                matches.Remove(cur);
+
+                foreach ((char c, int x, int y) match in matches)
+                {
+                    int curX = cur.x;
+                    int curY = cur.y;
+                    int matchX = match.x;
+                    int matchY = match.y;
+
+                    int xDif = curX - matchX;
+                    int yDif = curY - matchY;
+
+                    while (true)
+                    {
+                        Point a1 = new Point(curX + xDif, curY + yDif);
+                        Point a2 = new Point(matchX - xDif, matchY - yDif);
+
+                        if (day8isInBounds(a1.X, a1.Y, rows, cols))
+                        {
+                            if (!(antennas.Contains(a1) && grid.Select(x => x.x == a1.X && x.y == a1.Y) != null))
+                                antennas.Add(a1);
+                        }
+                        if (day8isInBounds(a2.X, a2.Y, rows, cols))
+                        {
+                            if (!(antennas.Contains(a2) && grid.Select(x => x.x == a2.X && x.y == a2.Y) != null))
+                                antennas.Add(a2);
+                        }
+
+                        curX = a1.X;
+                        curY = a1.Y;
+                        matchX = a2.X;
+                        matchY = a2.Y;
+
+                        if (!day8isInBounds(curX, curY, rows, cols) && !day8isInBounds(matchX, matchY, rows, cols))
+                            break;
+                    }
+                }
+            }
+
+            for (int i = 0; i < data.Count; i++)
+            {
+                List<char> s = data[i].ToCharArray().ToList();
+
+                List<Point> ants = antennas.FindAll(x => x.X == i).OrderBy(x => x.Y).ToList();
+                foreach (Point p in ants)
+                {
+                    if (s[p.Y] == '.')
+                    { 
+                        s[p.Y] = '#';
+                        count++;
+                    }
+                }
+
+                print(new string(s.ToArray()));
+            }
+
+            printInt(count + grid.Count);
         }
         #endregion
 
         #region day[9]
         static void day9a() //
         {
-
+            List<string> data = dataToList(getData("9"), Environment.NewLine);
         }
 
         static void day9b() //
