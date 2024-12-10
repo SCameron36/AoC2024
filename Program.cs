@@ -932,14 +932,131 @@ namespace AoC2024
         #endregion
 
         #region day[9]
-        static void day9a() //
+        static void day9a() //6385338159127
         {
-            List<string> data = dataToList(getData("9"), Environment.NewLine);
+            string data = getData("9");
+            List<int> disk = data.ToList().Select(day9CharToInt).ToList();
+            List<int> formattedDisk = new();
+            long checksum = 0;
+
+            for (int i = 0; i < disk.Count; i++)
+            {
+                int cur = disk[i];
+                if (i % 2 == 1)
+                {
+                    for (int j = 0; j < cur; j++)
+                    {
+                        formattedDisk.Add(-1);
+                    }
+                }
+                else
+                {
+                    for (int j = 0; j < cur; j++)
+                    {
+                        formattedDisk.Add(i / 2);
+                    }
+                }
+            }
+
+            for (int i = formattedDisk.Count - 1; i >= 0; i--)
+            {
+                if (formattedDisk[i] != -1)
+                {
+                    int index = formattedDisk.IndexOf(-1);
+                    if (index > i)
+                        break;
+                    formattedDisk[index] = formattedDisk[i];
+                    formattedDisk[i] = -1;
+                }
+            }
+
+            for (int i = 0; i < formattedDisk.Count; i++)
+            {
+                if (formattedDisk[i] != -1)
+                    checksum += (i * formattedDisk[i]);
+            }
+
+            printLong(checksum);
         }
 
-        static void day9b() //
+        static int day9CharToInt(char c)
         {
+            return int.Parse(c.ToString());
+        }
 
+        static string day9IntListToString(List<int> list)
+        {
+            string s = "";
+            foreach (int i in list)
+            {
+                s += i.ToString();
+            }
+            return s.Replace("-1",".");
+        }
+
+
+        static void day9b() //6415163624282
+        {
+            string data = getData("9");
+            List<int> disk = data.ToList().Select(day9CharToInt).ToList();
+            List<int> formattedDisk = new();
+
+            long checksum = 0;
+
+            for (int i = 0; i < disk.Count; i++)
+            {
+                int cur = disk[i];
+                if (i % 2 == 1)
+                {
+                    for (int j = 0; j < cur; j++)
+                    {
+                        formattedDisk.Add(-1);
+                    }
+                }
+                else
+                {
+                    for (int j = 0; j < cur; j++)
+                    {
+                        formattedDisk.Add(i / 2);
+                    }
+                }
+            }
+
+            for (int i = formattedDisk.Count - 1; i >= 0; i--)
+            {
+                if (formattedDisk[i] != -1)
+                {
+                    int curlen = formattedDisk.FindAll(x => x == formattedDisk[i]).Count;
+                    int gaplen = 0;
+                    for(int j = 0; j < formattedDisk.Count; j++)
+                    {
+                        if (formattedDisk[j] == -1)
+                            gaplen++;
+                        else
+                            gaplen = 0;
+                        
+                        if (gaplen == curlen)
+                        {
+                            for (int k = 0; k < gaplen; k++)
+                            {
+                                formattedDisk[j - k] = formattedDisk[i-k];
+                                formattedDisk[i - k] = -1;
+                            }
+                            break;
+                        }
+                        if (j >= i)
+                            break;
+                    }
+                }
+            }
+
+            for (int i = 0; i < formattedDisk.Count; i++)
+            {
+                if (formattedDisk[i] != -1)
+                    checksum += (i * formattedDisk[i]);
+            }
+
+            printLong(checksum);
         }
         #endregion
 
