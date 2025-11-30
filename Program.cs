@@ -1,8 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
+using System.Linq;
 using System.Net;
 using System.Numerics;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Xml;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AoC2024
@@ -192,6 +197,11 @@ namespace AoC2024
             Console.WriteLine(num);
         }
 
+        static void printBigInt(BigInteger num)
+        {
+            Console.WriteLine(num);
+        }
+
         static void printLong(long num)
         {
             Console.WriteLine(num);
@@ -222,9 +232,19 @@ namespace AoC2024
             return data.Split(splitOn).Select(int.Parse).ToList();
         }
 
+        static List<BigInteger> dataToBigIntList(string data, string splitOn)
+        {
+            return data.Split(splitOn).Select(BigInteger.Parse).ToList();
+        }
+
         static List<double> dataToDoubleList(string data, string splitOn)
         {
             return data.Split(splitOn).Select(double.Parse).ToList();
+        }
+
+        static List<long> dataToLongList(string data, string splitOn)
+        {
+            return data.Split(splitOn).Select(long.Parse).ToList();
         }
         #endregion
 
@@ -1063,7 +1083,7 @@ namespace AoC2024
         #region day 10
         static void day10a() //
         {
-
+            
         }
 
         static void day10b() //
@@ -1073,14 +1093,86 @@ namespace AoC2024
         #endregion
 
         #region day 11
-        static void day11a() //
+        static void day11a() //197157
         {
+            List<BigInteger> data = dataToBigIntList(getData("11"), " ");
+            List<BigInteger> newRow = new List<BigInteger>();
 
+            for (int i = 0; i < 25; i++)
+            {
+                newRow.Clear();
+                foreach (BigInteger r in data)
+                {
+                    if (r == 0)
+                        newRow.Add(1);
+                    else if (r.ToString().Length % 2 == 0)
+                    {
+                        string cur = r.ToString();
+                        newRow.Add(BigInteger.Parse(cur.Substring(0, cur.Length / 2)));
+                        newRow.Add(BigInteger.Parse(cur.Substring(cur.Length / 2)));
+                    }
+                    else
+                    {
+                        newRow.Add(r * 2024);
+                    }
+                }
+                data.Clear();
+                data.AddRange(newRow);
+            }
+
+            printInt(data.Count);
         }
 
-        static void day11b() //
+        static void day11b() //234430066982597
         {
+            var lines = getData("11");
 
+            var cache = new Dictionary<long, List<long>>();
+
+            var stones = new Dictionary<long, long>(); // engraving, multiplier
+            foreach (var stone in lines.Split(' ').Select(long.Parse).ToList())
+                stones.Add(stone, 1);
+
+            for (var i = 0; i < 75; i++)
+            {
+                var blink = new Dictionary<long, long>();
+                foreach (var stone in stones.Keys)
+                {
+                    var multiplier = stones[stone];
+                    foreach (var newStone in changeStones(stone))
+                        if (!blink.TryAdd(newStone, multiplier))
+                            blink[newStone] += multiplier;
+                }
+                stones = blink;
+            }
+
+            var answer = 0L;
+            foreach (var stone in stones.Keys)
+                answer += stones[stone];
+
+            Console.Write(answer);
+
+            List<long> changeStones(long engraving)
+            {
+                if (cache.TryGetValue(engraving, out List<long>? value))
+                    return value;
+
+                var change = new List<long>();
+
+                var str = $"{engraving}";
+                if (engraving == 0)
+                    change.Add(1);
+                else if (str.Length % 2 == 0)
+                {
+                    change.Add(long.Parse(str[..(str.Length / 2)]));
+                    change.Add(long.Parse(str[(str.Length / 2)..]));
+                }
+                else
+                    change.Add(engraving * 2024);
+
+                cache.Add(engraving, change);
+                return change;
+            }
         }
         #endregion
 
@@ -1109,9 +1201,50 @@ namespace AoC2024
         #endregion
 
         #region day 14
-        static void day14a() //
+        static void day14a() //230435667, 7709
         {
+            List<string> data = dataToList(getData("14"), Environment.NewLine);
 
+            var start = dataToList(getData("14"), Environment.NewLine).Select(line => string.Concat(
+        line.Where(ch => char.IsDigit(ch) || ch == ' ' || ch == '-' || ch == ','))
+    .Split([" ", ","], StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList())
+    .Select(arr => arr switch {
+        [var px, var py, var vx, var vy]
+        => (px, py, vx, vy)
+    }).ToList();
+
+            const int W = 101; const int H = 103;
+
+            (int x, int y)[] robots(int step) => start.Select(robot =>
+                (x: (robot.px + step * (robot.vx + W)) % W,
+                    y: (robot.py + step * (robot.vy + H)) % H)).ToArray();
+
+            long countQuadrants((int x, int y)[] robots)
+                => robots.CountBy(tp => tp switch {
+                    ( < W / 2, < H / 2) => 0,
+                    ( > W / 2, < H / 2) => 1,
+                    ( < W / 2, > H / 2) => 2,
+                    ( > W / 2, > H / 2) => 3,
+                    (var x, var y) when x == W / 2 || y == H / 2 => 99,
+                }).Where(kvp => kvp.Key != 99)
+                .Aggregate(1L, (acc, n) => acc * n.Value);
+
+            Console.WriteLine($"Part 1: {countQuadrants(robots(100))}");
+            (var bx, var by) = (analyse(true), analyse(false));
+
+            var part2 = bx + W * Enumerable.Range(0, int.MaxValue).First(i => (bx + W * i) % H == by);
+            Console.WriteLine($"Part 2: {part2}");
+
+            int analyse(bool xDir) =>
+                Enumerable.Range(0, xDir ? W : H).Index().MinBy(s => robots(s.Item)
+                .Select(point => xDir ? point.x : point.y) switch {
+                    var positions
+                => positions.Average() switch
+                {
+                    var mean
+                => positions.Sum(position => Math.Pow(position - mean, 2))
+                }
+                }).Index;
         }
 
         static void day14b() //
@@ -1204,10 +1337,25 @@ namespace AoC2024
         }
         #endregion
 
-        #region day22
+        #region day 22
         static void day22a() // 
         {
+            List<BigInteger> data = dataToBigIntList(getData("22"), Environment.NewLine);
+            BigInteger total = 0;
+            foreach (BigInteger value in data)
+            {
+                BigInteger newVal = value;
+                for (int i = 0; i < 1000; i++)
+                {
+                    newVal *= 64;
 
+                    newVal /= 32;
+
+
+                }
+                total += newVal;
+            }
+            printBigInt(total);
         }
 
         static void day22b() // 
